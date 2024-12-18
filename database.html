@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Pelanggan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Database Pelanggan Nala Aircon</h1>
+        <table id="dataTable">
+            <thead>
+                <tr>
+                    <th>No</th>
+                    <th>Nama Pelanggan</th>
+                    <th>Nomor Telepon</th>
+                    <th>Alamat</th>
+                    <th>Jumlah Unit AC</th>
+                    <th>Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Data akan diisi dari Firebase -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- View Dropdown Section -->
+    <div id="viewSection" class="hidden">
+        <h2>Detail Unit AC</h2>
+        <ul id="acDetails"></ul>
+        <button onclick="closeView()">Tutup</button>
+    </div>
+
+    <!-- Update Section -->
+    <div id="updateSection" class="hidden">
+        <h2>Update Data Pelanggan</h2>
+        <form id="updateForm">
+            <label for="tanggal">Tanggal Pengerjaan Terakhir:</label>
+            <input type="date" id="tanggal" required>
+
+            <label for="teknisi">Teknisi:</label>
+            <input type="text" id="teknisi" placeholder="Nama Teknisi" required>
+
+            <label for="layanan">Jenis Layanan:</label>
+            <input type="text" id="layanan" placeholder="Jenis Layanan" required>
+
+            <button type="submit">Save</button>
+        </form>
+    </div>
+
+    <!-- Firebase SDK and Script -->
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-app.js";
+        import { getFirestore, collection, getDocs, updateDoc, doc } from "https://www.gstatic.com/firebasejs/9.0.2/firebase-firestore.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAi53ISUus9hZvOGNQLQYH22US39r60kEs",
+            authDomain: "corsecdatabase.firebaseapp.com",
+            projectId: "corsecdatabase",
+            storageBucket: "corsecdatabase.firebasestorage.app",
+            messagingSenderId: "352663886420",
+            appId: "1:352663886420:web:a62bd417bb1b2bd9342bc1",
+            measurementId: "G-LLE3WFY0GY"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        const tableBody = document.querySelector("#dataTable tbody");
+        const viewSection = document.getElementById("viewSection");
+        const acDetails = document.getElementById("acDetails");
+        const updateSection = document.getElementById("updateSection");
+        const updateForm = document.getElementById("updateForm");
+        let currentDocId = null;
+
+        // Fetch and display data from Firestore
+        async function fetchData() {
+            const querySnapshot = await getDocs(collection(db, "customers"));
+            let index = 1;
+            tableBody.innerHTML = ""; // Clear table
+
+            querySnapshot.forEach((doc) => {
+                const data = doc.data();
+                const row = `
+                    <tr>
+                        <td>${index++}</td>
+                        <td>${data.nama}</td>
+                        <td>${data.nomor}</td>
+                        <td>${data.alamat}</td>
+                        <td>${data.jumlahAC}</td>
+                        <td>
+                            <button onclick="viewDetails('${doc.id}', ${JSON.stringify(data.unitAC)})">View</button>
+                            <button onclick="editData('${doc.id}')">Edit</button>
+                            <button onclick="updateData('${doc.id}')">Update</button>
+                        </td>
+                    </tr>
+                `;
+                tableBody.innerHTML += row;
+            });
+        }
+
+        // View Details
+        window.viewDetails = function (docId, unitAC) {
+            acDetails.innerHTML = ""; // Clear previous details
+            unitAC.forEach((ac, i) => {
+                acDetails.innerHTML += `<li>Unit ${i + 1}: Model ${ac.model}, Freon ${ac.freon}, Kapasitas ${ac.kapasitas}, Jenis ${ac.jenis}</li>`;
+            });
+            viewSection.classList.remove("hidden");
+        };
+
+        function closeView() {
+            viewSection.classList.add("hidden");
+        }
+
+        // Edit Data
+        window.editData = function (docId) {
+            alert("Edit fungsi untuk form input di masa depan");
+        };
+
+        // Update Data
+        window.updateData = function (docId) {
+            currentDocId = docId;
+            updateSection.classList.remove("hidden");
+        };
+
+        updateForm.addEventListener("submit", async (e) => {
+            e.preventDefault();
+
+            const tanggal = document.getElementById("tanggal").value;
+            const teknisi = document.getElementById("teknisi").value;
+            const layanan = document.getElementById("layanan").value;
+
+            const docRef = doc(db, "customers", currentDocId);
+            await updateDoc(docRef, {
+                tanggalPengerjaan: tanggal,
+                teknisi: teknisi,
+                jenisLayanan: layanan
+            });
+
+            alert("Data berhasil diupdate!");
+            updateSection.classList.add("hidden");
+            fetchData();
+        });
+
+        // Fetch data on load
+        fetchData();
+    </script>
+</body>
+</html>

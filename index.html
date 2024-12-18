@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Input Data Pelanggan</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Form Input Data Pelanggan</h1>
+        <form id="customerForm">
+            <!-- Nama Pelanggan -->
+            <label for="nama">Nama Pelanggan:</label>
+            <input type="text" id="nama" name="nama" placeholder="Masukkan Nama Pelanggan" required>
+
+            <!-- Nomor Telepon -->
+            <label for="nomor">Nomor Telepon:</label>
+            <input type="tel" id="nomor" name="nomor" placeholder="Masukkan Nomor Telepon" required>
+
+            <!-- Jumlah Unit AC -->
+            <label for="jumlahAC">Jumlah Unit AC:</label>
+            <select id="jumlahAC" name="jumlahAC" required>
+                <option value="">Pilih Jumlah Unit</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+                <option value="8">8</option>
+                <option value="9">9</option>
+                <option value="10">10</option>
+            </select>
+
+            <!-- Dynamic AC Fields -->
+            <div id="acFields"></div>
+
+            <!-- Alamat Pelanggan -->
+            <label for="alamat">Alamat Pelanggan:</label>
+            <textarea id="alamat" name="alamat" rows="3" placeholder="Masukkan Alamat Pelanggan" required></textarea>
+
+            <!-- Submit Button -->
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <!-- Popup Notification -->
+    <div id="popup" class="hidden">
+        <p>Data Pelanggan Berhasil diinput!</p>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const jumlahAC = document.getElementById("jumlahAC");
+            const acFieldsContainer = document.getElementById("acFields");
+            const customerForm = document.getElementById("customerForm");
+            const popup = document.getElementById("popup");
+
+            jumlahAC.addEventListener("change", function () {
+                const unitCount = parseInt(this.value);
+                acFieldsContainer.innerHTML = ""; // Hapus field sebelumnya
+
+                if (unitCount > 0) {
+                    for (let i = 1; i <= unitCount; i++) {
+                        const fieldset = document.createElement("fieldset");
+                        fieldset.innerHTML = `
+                            <legend>Unit AC ${i}</legend>
+                            <label for="model${i}">Model AC:</label>
+                            <select id="model${i}" name="model${i}" required>
+                                <option value="Midea">Midea</option>
+                                <option value="Daikin">Daikin</option>
+                                <option value="LG">LG</option>
+                                <option value="Toshiba">Toshiba</option>
+                                <option value="Panasonic">Panasonic</option>
+                                <option value="TCL">TCL</option>
+                                <option value="Changhong">Changhong</option>
+                                <option value="Samsung">Samsung</option>
+                            </select>
+
+                            <label for="freon${i}">Type Freon:</label>
+                            <select id="freon${i}" name="freon${i}" required>
+                                <option value="R32">R32</option>
+                                <option value="R410">R410</option>
+                                <option value="R22">R22</option>
+                            </select>
+
+                            <label for="kapasitas${i}">Kapasitas:</label>
+                            <select id="kapasitas${i}" name="kapasitas${i}" required>
+                                <option value="1/2pk">1/2pk</option>
+                                <option value="1pk">1pk</option>
+                                <option value="1.5pk">1.5pk</option>
+                                <option value="2pk">2pk</option>
+                                <option value="3pk">3pk</option>
+                                <option value="5pk">5pk</option>
+                            </select>
+
+                            <label for="jenis${i}">Jenis:</label>
+                            <select id="jenis${i}" name="jenis${i}" required>
+                                <option value="Inverter">Inverter</option>
+                                <option value="Non Inverter">Non Inverter</option>
+                            </select>
+                        `;
+                        acFieldsContainer.appendChild(fieldset);
+                    }
+                }
+            });
+
+            customerForm.addEventListener("submit", function (e) {
+                e.preventDefault();
+                popup.classList.remove("hidden");
+                setTimeout(() => {
+                    popup.classList.add("hidden");
+                    customerForm.reset();
+                    acFieldsContainer.innerHTML = "";
+                }, 2000);
+            });
+        });
+    </script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(to bottom right, #6dd5ed, #2193b0);
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            background: #fff;
+            padding: 20px;
+            margin: 50px auto;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+            font-weight: bold;
+            color: #555;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #2193b0;
+            color: white;
+            padding: 10px;
+            margin-top: 15px;
+            width: 100%;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #6dd5ed;
+        }
+
+        #popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            display: none;
+        }
+
+        #popup p {
+            margin: 0;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        #popup.hidden {
+            display: none;
+        }
+    </style>
+</body>
+</html>
